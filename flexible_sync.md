@@ -17,19 +17,40 @@ I am incredibly proud of the work that our team did over the past few years to m
 
 ## 1. Overview
 
+### What is Realm Cloud?
+
+Realm Cloud is an app building platform to make building applications with MongoDB faster, easier, and more scalable. It contains features such as: 
+1. Authentication and session management 
+2. Triggers: run functions in response to modifications made in MongoDB 
+3. GraphQL Service 
+4. Sync 
+
+And many others, but those are just a few to highlight. To see the whole suite of services offered by Realm Cloud see the diagram below: 
+
+![Realm Services Overview](./images/realm_all.png)
+
+### What is Sync? 
+
 Sync was designed from the ground-up to provide a best-in-class experience for synchronizing data between mobile clients.
 
 Taking a quick step back, lets first define the goals of MongoDB Realm Sync:
 
 1. Immediate propagation of changes to connected clients:
-   - Any time a change is made either from a Sync client or from an external MongoDB client (shell, driver, etc), the change is immediately sent to all relevant sync clients if they currently have a connection to Realm Cloud.
+   - Any time a change is made either from a mobile device or from an external MongoDB client (shell, driver, etc), the change is immediately sent to all relevant mobile devices if they currently have a connection to Realm Cloud.
 
 2. Offline-first data:
-   - The sync protocol allows clients to behave normally during network interruptions and automatically resume uploading / downloading changes from Realm Cloud when it regains internet connection in such a way that no changes are dropped or missed. This lets applications be designed to read and write data locally in Realm on the device and the data in Realm will be updated asynchronously when needed / possible. 
+   - The sync protocol allows devices to behave normally during network interruptions and automatically resume uploading / downloading changes from Realm Cloud when it regains internet connection in such a way that no changes are dropped or missed. This lets applications be designed to read and write data locally in Realm on the device and the data in Realm will be updated asynchronously when needed / possible. 
 
 3. Conflict-Resolution:
-   - If multiple clients are updating the same underlying MongoDB document, sync performs conflict resolution using the Operational Transformation algorithm.
+   - If multiple devices are updating the same underlying MongoDB document, Realm Sync performs conflict resolution using the Operational Transformation algorithm.
    - For simple updates such as Update("field1", 123) we use a "last writer wins" policy; however, when using lists, smarter resolutions are used to preserve the intent of the users change and incorporate both writes (think of two clients inserting an element into the same list)
+   - For more information about the conflict resolution performed by realm [see here](https://docs.mongodb.com/realm/sync/learn/conflict-resolution/)
+
+
+Sync is architected to maximize the throughput of the system and allows customers to pay only for the amount of sync traffic that they generate. 
+
+![Sync Overview](./images/realm_sync.png)
+
 
 ## 2. Schemas
 
@@ -98,12 +119,17 @@ either the SDK's subscription or the read and write permissions defined for Flex
 The reasoning why these are needed is very technical, but essentially a lot of metadata is needed for Flexible Sync to work properly and
 the there is a linear correlation in some ways between the number of queryable fields and the storage needed for this metadata. 
 
-### 3.1: Limitations on Queryable Fields
+### 3.1: Why  do we need them? 
+
+![Router](./images/router.png)
+
+
+### 3.2: Limitations on Queryable Fields
 
 Queryable fields can currently be any primitive field in the Realm object. We are currently working on adding support for lists and embedded objects 
 to be queryable as well and that should be done in the near future. 
 
-###  3.2: Updating Queryable Fields
+###  3.3: Updating Queryable Fields
 
 Updating the queryable fields defined for Flexible Sync is supported (even as sync is running). Adding a field is simple as it can be added and clients 
 will not be interrupted at all and there is no effect on the system other than the fact that subcriptions can now refeence this field in all tables. 
