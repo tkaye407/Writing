@@ -78,11 +78,18 @@ This can be done one of 2 ways:
     - A handy feature is that if your MongoDB collection already contains data, you can click "generate schema" and documents will be sampled from the collection and a schema will be generated automatically and you can make tweaks from there. 
     - If you choose this route, you may also find it helpful to navigate to the SDK's tab and click on "Data Models" and you can copy/paste the schema you have defined in the languages of each of the various SDKs (swift, obj-c, java, kotlin, js, c#).
 
+![JSON Schema](./images/schema.png)
+
 2. Client-Side Schema Definitions (Developer Mode):
     - If you are used to working with Realm and dont want to play with a JSON schema, then you can enable "developer mode" in the sync configuration page
     - This will allow the device to upload the schema defined in the SDK to the server and automatically populate the server-side JSON schema. 
     - This is very handy if you are prototyping and need to keep adding fields.
     - However, it is not recommended that an application be put into production with developer mode still enabled.
+
+![Dev Mode](./images/dev_mode.png)
+
+![SDK Models](./images/sdk_models.png)
+
 
 ### 2.2: Making changes to your schema
 
@@ -104,7 +111,8 @@ Making changes to your schema is supported by sync however there are some caveat
     These changes can only be made from the UI (not from a device in dev mode or the realm-cli) in order to eliminate the possibility of accidentally doing this. When you make a breaking change, the UI will warn you of the implications but functionally what will happen is: 
     1. Sync will terminate and remove all sync metadata 
     2. Sync will re-initialize and download all data from MongoDB and add it to Realm Sync
-    3. All devices will receive a Client Reset error sent to them to perform a ClientReset (TODO: See here) and then reconnect and resume syncing
+    3. All devices will receive a Client Reset error sent to them to perform a ClientReset and then reconnect and resume syncing
+    	- [See here](https://docs.mongodb.com/realm/sync/error-handling/client-resets/) for more information about how to handle a client reset with the SDK.
 
     While this works without any issues, it is still advised that breaking changes be minimized, especially in production applications. 
 
@@ -112,13 +120,15 @@ Making changes to your schema is supported by sync however there are some caveat
     1. Instead of renaming a field name or type, try just creating a second field
     2. Instead of removing a field from the server-side schema, leave it in there and just remove it from your SDK definitions and it will be "invisible". 
 
-// TODO: Link to new doc 
+[See here](https://docs.mongodb.com/realm/sync/data-model/update-schema/) for more information about how to update schemas while sync is running. 
 
 
 ## 3: Queryable Fields 
 
 One requirement of sync is to define a set of "queryable" fields. These are the fields that can be referenced by 
 either the SDK's subscription or the read and write permissions defined for Flexible Sync. (both of these will be covered below). 
+
+![Queryable Fields](./images/queryable_fields.png)
 
 ### 3.1: Why  do we need them? 
 
@@ -178,18 +188,18 @@ This is the core feature of Flexible Sync. A "subscription" can most easily be t
 
 Each SDK defines an API to manage the subscriptions that a device wants to sync on. Subscriptions can be added, removed, updated, or cleared. The SDK can update its subscriptions while sync is running and sync will continue working and any old data that the SDK should no longer have will be removed and any new data will be sent to the SDK. 
 
-Flexible Sync does not support all the operators available in RQL. 
-TODO: Flexible Sync RQL limitations for details.
+Flexible Sync does not support all the operators available in RQL, but we are always working on adding support for more of them. 
 
 
 ## 5: Permissions
-
 
 Flexible Sync has a more powerful permission system and can be applied on a per-document level in comparison to the partition-based permission system that does not offer granular filtering. 
 
 You may be asking why permissions are needed when the SDK can just only subscribe to the data it is interested in. The simple answer is that as an App Developer / Admin on the project, you may want to restrict what data devices can query for and what data they are allowed to update.
 
-Say your app has a text box and that input is used to create a subscription to sync on. As an admin, you may want to only allow them to read that data, or you want to only let them read a subset of that data. Permissions are how you can get these benefits. Additionally, you can have different permissions for different users, this is what "roles" are. 
+Say your app has a text box and that input is used to create a subscription to sync on. As an admin, you may want to only allow them to read that data, or you want to only let them read a subset of that data. Permissions are how you can get these benefits. Additionally, you can have different permissions for different users, this is what "roles" are.
+
+![Permissions](./images/permissions.png)
 
 ### 5.1: Permissions Format: 
 
@@ -254,7 +264,7 @@ When a device connects, it is assigned a roll based on the set of permissions, u
 	c. Otherwise, go to the next role in the list and continue on 
 2. If there are no table-specific roles, do the same steps as above but using the defaultRoles as the list of roles 
 
-TODO: [See here]() for more details on how to use custom user data in Realm Sync. 
+[See here](https://docs.mongodb.com/realm/users/enable-custom-user-data/) for more details on how to use custom user data in Realm Sync. 
 
 
 ### 5.4: Changing Permissions
@@ -268,7 +278,4 @@ I am so happy that we can bring the power of flexible sync to customers and am e
 
 I hope that you enjoy sync and that it can make you, your organization, and your customers more productive! 
 Tyler
-
-
-
 
